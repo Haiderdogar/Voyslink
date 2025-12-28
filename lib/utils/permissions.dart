@@ -1,46 +1,47 @@
-import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 
 class PermissionUtils {
-  static Future<bool> requestAll() async {
-    final List<Permission> permissions = [];
+  static Future<bool> requestBluetoothPermissions() async {
+    // Check for Android 12+ permissions
+    final permissions = [
+      Permission.bluetooth,
+      Permission.bluetoothConnect,
+      Permission.bluetoothScan,
+    ];
 
-    if (Platform.isAndroid) {
-      permissions.addAll([
-        Permission.locationWhenInUse,
-        Permission.bluetoothScan,
-        Permission.bluetoothConnect,
-      ]);
-    }
-
-    if (Platform.isIOS) {
-      permissions.add(Permission.bluetooth);
-      // Note: iOS also needs location permission for BLE scanning
+    // Add location permission for Android 6-11
+    if (!await _isAndroid12OrAbove()) {
       permissions.add(Permission.locationWhenInUse);
     }
 
-    bool granted = true;
-
-    for (final p in permissions) {
-      if (!await p.isGranted) {
-        final result = await p.request();
-        if (!result.isGranted) granted = false;
-      }
+    // Add notification permission for Android 13+
+    if (await _isAndroid13OrAbove()) {
+      permissions.add(Permission.notification);
     }
 
-    return granted;
+    // Add storage permissions if needed
+    permissions.add(Permission.storage);
+
+    final Map<Permission, PermissionStatus> statuses = await permissions.request();
+
+    return statuses.values.every((status) => status.isGranted);
   }
 
-  // Check if all required permissions are granted
-  static Future<bool> checkAllGranted() async {
-    if (Platform.isAndroid) {
-      return await Permission.locationWhenInUse.isGranted &&
-          await Permission.bluetoothScan.isGranted &&
-          await Permission.bluetoothConnect.isGranted;
-    } else if (Platform.isIOS) {
-      return await Permission.bluetooth.isGranted &&
-          await Permission.locationWhenInUse.isGranted;
-    }
-    return false;
+  static Future<bool> _isAndroid12OrAbove() async {
+    // Check Android version logic
+    // You can use device_info_plus package for this
+    return false; // Implement based on your needs
+  }
+
+  static Future<bool> _isAndroid13OrAbove() async {
+    // Check Android version logic
+    return false; // Implement based on your needs
+  }
+
+  static Future<bool> checkBluetoothPermissions() async {
+    return await Permission.bluetooth.isGranted &&
+        await Permission.bluetoothConnect.isGranted &&
+        await Permission.bluetoothScan.isGranted &&
+        await Permission.locationWhenInUse.isGranted;
   }
 }

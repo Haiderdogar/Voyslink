@@ -18,6 +18,23 @@
     <!-- Audio -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+    <!-- Android 13+ Notification Permission -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Optional: For file upload features -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <!-- Add this for better BLE compatibility -->
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
+
+    <!-- Add this to declare app uses Bluetooth -->
+    <uses-feature
+        android:name="android.hardware.bluetooth"
+        android:required="true" />
+
 
     <application
         android:label="voyslink"
